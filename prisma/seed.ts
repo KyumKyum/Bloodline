@@ -131,7 +131,7 @@ const mysteries = [
     synopsis: "외딴 섬에서 발생한 살인 사건. 용의자 모두와 관련이 있는 인물, '야스다'. 야스다는 과연 누구인가.",
     imagePath: "/mysteries/Y.jpg",
     markdownPath: "content/mysteries/Y.md",
-  }
+  },
   {
     order: 115,
     slug: 'In-a-Inn',
