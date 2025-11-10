@@ -114,7 +114,9 @@ const mysteries = [
     order: 112,
     slug: "Shinofuchi-Rewrite",
     title: "보랏못 리라이트 (Shinofuchi Rewrite)",
-    synopsis: "캠핑장에서 발견된 시체. 숨겨진 벚나무의 얽힌 전설. 계속해서 다시 쓰여나가는 사건의 정보들."
+    synopsis: "캠핑장에서 발견된 시체. 숨겨진 벚나무의 얽힌 전설. 계속해서 다시 쓰여나가는 사건의 정보들.",
+    imagePath: "/mysteries/rewrite.jpg",
+    markdownPath: "content/mysteries/rewrite.md",
   },
   {
     order: 113,

@@ -19,10 +19,13 @@ export function Header() {
             <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full" />
           ) : session ? (
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-gray-700">
+              <Link
+                href="/profile"
+                className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+              >
                 <User className="w-4 h-4" />
                 <span className="text-sm">{session.user.username}</span>
-              </div>
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
                 className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"

@@ -98,21 +98,20 @@ export function DifficultyRatingSection({
         <div className="flex items-center space-x-2">
           <Brain className="w-5 h-5 text-purple-600" />
           <span className="font-medium text-gray-900">난이도 평가</span>
-          <DifficultyBadge 
-            difficulty={averageDifficulty} 
-            totalRatings={totalDifficultyRatings} 
-          />
         </div>
         {averageDifficulty !== null && totalDifficultyRatings > 0 && (
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center">
-              {renderDifficultyStars(averageDifficulty)}
-            </div>
-            <span className="text-sm font-semibold text-purple-600">
-              {averageDifficulty.toFixed(1)}
-            </span>
+          <div className="flex items-center space-x-4">
+            <DifficultyBadge 
+              difficulty={averageDifficulty} 
+              totalRatings={totalDifficultyRatings}
+            />
+            <DifficultyBadge 
+              difficulty={averageDifficulty} 
+              totalRatings={totalDifficultyRatings}
+              showNumeric={true}
+            />
             <span className="text-gray-500 text-sm">
-              ({totalDifficultyRatings} rating{totalDifficultyRatings !== 1 ? 's' : ''})
+              ({totalDifficultyRatings} 평가)
             </span>
           </div>
         )}
