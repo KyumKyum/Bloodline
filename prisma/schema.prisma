@@ -20,6 +20,7 @@ model User {
   // Relations
   ratings           Rating[]
   difficultyRatings DifficultyRating[]
+  comments          Comment[]
 
   @@map("users")
 }
@@ -38,6 +39,7 @@ model Mystery {
   // Relations
   ratings           Rating[]
   difficultyRatings DifficultyRating[]
+  comments          Comment[]
 
   @@map("mysteries")
 }
@@ -76,4 +78,22 @@ model DifficultyRating {
   // Composite unique constraint - one difficulty rating per user per mystery
   @@unique([userId, mysteryId])
   @@map("difficulty_ratings")
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  userId          String
+  mysteryId       String
+  content         String   // The comment text
+  spoilerConsent  Boolean  @default(false) // User confirmed no spoilers
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mystery Mystery @relation(fields: [mysteryId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint - one comment per user per mystery
+  @@unique([userId, mysteryId])
+  @@map("comments")
 }

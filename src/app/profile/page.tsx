@@ -18,7 +18,7 @@ export const metadata = {
 }
 
 async function getUserRatings(userId: string) {
-  const [ratings, difficultyRatings] = await Promise.all([
+  const [ratings, difficultyRatings, comments] = await Promise.all([
     // Get user's star ratings with mystery details
     prisma.rating.findMany({
       where: { userId },
@@ -30,6 +30,15 @@ async function getUserRatings(userId: string) {
     
     // Get user's difficulty ratings with mystery details
     prisma.difficultyRating.findMany({
+      where: { userId },
+      include: {
+        mystery: true
+      },
+      orderBy: { updatedAt: 'desc' }
+    }),
+    
+    // Get user's comments with mystery details
+    prisma.comment.findMany({
       where: { userId },
       include: {
         mystery: true

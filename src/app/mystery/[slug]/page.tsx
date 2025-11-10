@@ -9,6 +9,7 @@ import { RatingSection } from '@/components/RatingSection'
 import { Header } from '@/components/Header'
 import { DifficultyBadge } from '@/components/DifficultyBadge'
 import { DifficultyRatingSection } from '@/components/DifficultyRatingSection'
+import CommentSection from '@/components/CommentSection'
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic'
@@ -142,6 +143,11 @@ export default async function MysteryPage({ params }: MysteryPageProps) {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Comment Section */}
+          <div className="p-6 border-t">
+            <CommentSection mysteryId={mystery.id} />
           </div>
         </div>
       </main>
