@@ -1,0 +1,45 @@
+import { PrismaClient } from '@prisma/client'
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+
+// Load environment variables from .env.local first (higher priority)
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local'), override: true })
+
+// Ensure we're using the correct DATABASE_URL
+process.env.DATABASE_URL = "postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public"
+
+const prisma = new PrismaClient()
+
+const mysteries = [
+  {
+    slug: 'Crime-and-Punishment-In-Bibliotheca',
+    title: '죄와 벌의 도서관 (Crime and Punishment In Bibliotheca)',
+    synopsis: '밀실에서 살해당한 도서관의 관장. 히무라 도서관을 감싸는 "읽으면 죽는 고서"의 비밀.',
+    imagePath: '/mysteries/bibiliotheca.jpg',
+    markdownPath: 'content/mysteries/bibiliotheca.md',
+  },
+]
+
+async function main() {
+  console.log('🌱 Start seeding...')
+  
+  for (const mystery of mysteries) {
+    const result = await prisma.mystery.upsert({
+      where: { slug: mystery.slug },
+      update: mystery,
+      create: mystery
+    })
+    console.log(`Created/Updated mystery: ${result.title}`)
+  }
+  
+  console.log('🌱 Seeding finished.')
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

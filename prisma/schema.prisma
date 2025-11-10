@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ratings           Rating[]
+  difficultyRatings DifficultyRating[]
+
+  @@map("users")
+}
+
+model Mystery {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  synopsis    String
+  imagePath   String
+  markdownPath String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  ratings           Rating[]
+  difficultyRatings DifficultyRating[]
+
+  @@map("mysteries")
+}
+
+
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  mysteryId String
+  rating    Float    // 1.0-5.0 rating with one decimal point
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mystery Mystery @relation(fields: [mysteryId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint - one rating per user per mystery
+  @@unique([userId, mysteryId])
+  @@map("ratings")
+}
+
+model DifficultyRating {
+  id           String   @id @default(cuid())
+  userId       String
+  mysteryId    String
+  difficulty   Float    // 1.0-5.0 difficulty rating with one decimal point
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mystery Mystery @relation(fields: [mysteryId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint - one difficulty rating per user per mystery
+  @@unique([userId, mysteryId])
+  @@map("difficulty_ratings")
+}
