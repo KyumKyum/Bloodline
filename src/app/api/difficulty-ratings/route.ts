@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,6 +63,10 @@ export async function POST(request: NextRequest) {
         difficulty: roundedDifficulty
       }
     })
+
+    // Revalidate the home page and mystery page to show updated difficulty ratings
+    revalidatePath('/')
+    revalidatePath(`/mystery/${mystery.slug}`)
 
     return NextResponse.json(
       { message: 'Difficulty rating submitted successfully', rating: userDifficultyRating },

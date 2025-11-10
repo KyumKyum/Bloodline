@@ -2,6 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { MysteryCard } from '@/components/MysteryCard'
 import { Header } from '@/components/Header'
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function getMysteries() {
   const mysteries = await prisma.mystery.findMany({
     include: {
@@ -19,7 +23,7 @@ async function getMysteries() {
     }
   })
 
-  const processedMysteries = mysteries.map((mystery: any) => ({
+  return mysteries.map((mystery: any) => ({
     ...mystery,
     averageRating: mystery.ratings.length > 0 
       ? mystery.ratings.reduce((acc: number, rating: any) => acc + rating.rating, 0) / mystery.ratings.length
@@ -30,18 +34,6 @@ async function getMysteries() {
       : null,
     totalDifficultyRatings: mystery._count.difficultyRatings
   }))
-
-  // Debug logging (will show up in server logs)
-  if (process.env.NODE_ENV === 'development') {
-    processedMysteries.forEach(mystery => {
-      console.log(`Mystery: ${mystery.title}`)
-      console.log(`  Difficulty Ratings Count: ${mystery.difficultyRatings.length}`)
-      console.log(`  Average Difficulty: ${mystery.averageDifficulty}`)
-      console.log(`  Total Difficulty Ratings: ${mystery.totalDifficultyRatings}`)
-    })
-  }
-
-  return processedMysteries
 }
 
 export default async function Home() {

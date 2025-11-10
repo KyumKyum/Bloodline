@@ -10,6 +10,10 @@ import { Header } from '@/components/Header'
 import { DifficultyBadge } from '@/components/DifficultyBadge'
 import { DifficultyRatingSection } from '@/components/DifficultyRatingSection'
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface MysteryPageProps {
   params: Promise<{
     slug: string
