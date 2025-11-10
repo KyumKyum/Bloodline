@@ -1,12 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import * as dotenv from 'dotenv'
-import * as path from 'path'
-
-// Load environment variables from .env.local first (higher priority)
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local'), override: true })
-
-// Ensure we're using the correct DATABASE_URL
-process.env.DATABASE_URL = "postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public"
 
 const prisma = new PrismaClient()
 

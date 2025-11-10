@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
+    "build:local": "dotenv -e .env.prod -- prisma generate && dotenv -e .env.prod -- next build",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "prisma migrate deploy",
+    "db:migrate": "DATABASE_URL=\"postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public\" prisma migrate dev",
+    "db:migrate:prod": "dotenv -e .env.prod -- prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio",
+    "db:seed:prod": "dotenv -e .env.prod -- tsx prisma/seed.ts",
+    "db:studio": "DATABASE_URL=\"postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public\" prisma studio",
     "db:reset": "npm run db:migrate && npm run db:seed",
     "postinstall": "prisma generate"
   },
@@ -33,14 +36,16 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
     "babel-plugin-react-compiler": "1.0.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
-    "tailwindcss": "^4",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
     "tsx": "^4.20.6",
     "typescript": "^5"
   }
