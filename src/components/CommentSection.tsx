@@ -25,6 +25,7 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userComment, setUserComment] = useState<Comment | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Fetch comments
   useEffect(() => {
@@ -45,6 +46,11 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
             comment.user.username === session.user?.username
           );
           setUserComment(existing || null);
+          // If editing, populate the form with existing comment
+          if (existing && isEditing) {
+            setNewComment(existing.content);
+            setSpoilerConsent(existing.spoilerConsent);
+          }
         }
       }
     } catch (error) {
@@ -74,8 +80,9 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
 
     setSubmitting(true);
     try {
+      const method = isEditing ? 'PUT' : 'POST';
       const response = await fetch('/api/comments', {
-        method: 'POST',
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -87,21 +94,47 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
       });
 
       if (response.ok) {
-        const newCommentData = await response.json();
-        setComments([newCommentData, ...comments]);
-        setUserComment(newCommentData);
+        const commentData = await response.json();
+        
+        if (isEditing) {
+          // Update existing comment in the list
+          setComments(comments.map(comment => 
+            comment.id === commentData.id ? commentData : comment
+          ));
+          setUserComment(commentData);
+          setIsEditing(false);
+        } else {
+          // Add new comment to the list
+          setComments([commentData, ...comments]);
+          setUserComment(commentData);
+        }
+        
         setNewComment('');
         setSpoilerConsent(false);
       } else {
         const error = await response.json();
-        alert(error.error || '댓글 작성에 실패했습니다.');
+        alert(error.error || (isEditing ? '댓글 수정에 실패했습니다.' : '댓글 작성에 실패했습니다.'));
       }
     } catch (error) {
       console.error('Failed to submit comment:', error);
-      alert('댓글 작성 중 오류가 발생했습니다.');
+      alert(isEditing ? '댓글 수정 중 오류가 발생했습니다.' : '댓글 작성 중 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleEdit = () => {
+    if (userComment) {
+      setNewComment(userComment.content);
+      setSpoilerConsent(userComment.spoilerConsent);
+      setIsEditing(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setNewComment('');
+    setSpoilerConsent(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -128,7 +161,7 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
         </p>
       </div>
       {/* Comment Form */}
-      {session?.user && !userComment && (
+      {session?.user && (!userComment || isEditing) && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <textarea
@@ -157,26 +190,46 @@ export default function CommentSection({ mysteryId }: CommentSectionProps) {
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={!spoilerConsent || !newComment.trim() || submitting}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            {submitting ? '작성 중...' : '댓글 작성'}
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              type="submit"
+              disabled={!spoilerConsent || !newComment.trim() || submitting}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              {submitting ? (isEditing ? '수정 중...' : '작성 중...') : (isEditing ? '댓글 수정' : '댓글 작성')}
+            </button>
+            
+            {isEditing && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                취소
+              </button>
+            )}
+          </div>
         </form>
       )}
 
       {/* User already commented message */}
-      {session?.user && userComment && (
+      {session?.user && userComment && !isEditing && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <span className="text-blue-800 font-medium">
-              이미 이 시나리오에 댓글을 작성하셨습니다.
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <span className="text-blue-800 font-medium">
+                이미 이 시나리오에 댓글을 작성하셨습니다.
+              </span>
+            </div>
+            <button
+              onClick={handleEdit}
+              className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+            >
+              수정
+            </button>
           </div>
         </div>
       )}

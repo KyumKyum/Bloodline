@@ -85,3 +85,58 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: '댓글 조회 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
+    }
+
+    const { mysteryId, content, spoilerConsent } = await request.json();
+
+    if (!mysteryId || !content || spoilerConsent === undefined) {
+      return NextResponse.json({ error: '필수 정보가 누락되었습니다.' }, { status: 400 });
+    }
+
+    // Check if user has a comment for this mystery
+    const existingComment = await (prisma as any).comment.findUnique({
+      where: {
+        userId_mysteryId: {
+          userId: session.user.id,
+          mysteryId: mysteryId
+        }
+      }
+    });
+
+    if (!existingComment) {
+      return NextResponse.json({ error: '수정할 댓글이 없습니다.' }, { status: 404 });
+    }
+
+    const updatedComment = await (prisma as any).comment.update({
+      where: {
+        userId_mysteryId: {
+          userId: session.user.id,
+          mysteryId: mysteryId
+        }
+      },
+      data: {
+        content: content.trim(),
+        spoilerConsent
+      },
+      include: {
+        user: {
+          select: {
+            username: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(updatedComment);
+  } catch (error) {
+    console.error('Comment update error:', error);
+    return NextResponse.json({ error: '댓글 수정 중 오류가 발생했습니다.' }, { status: 500 });
+  }
+}
