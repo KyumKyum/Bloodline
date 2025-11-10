@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bloodline - Murder Mystery Archive",
-  description: "Discover and rate the most intriguing murder mysteries",
+  title: "Bloodline - 머더 미스터리 아카이브",
+  description: "주인장이 해본 머미만 기록합니다.",
 };
 
 export default function RootLayout({
