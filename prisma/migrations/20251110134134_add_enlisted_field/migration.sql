@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "mysteries" ADD COLUMN     "enlisted" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

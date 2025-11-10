@@ -19,7 +19,7 @@ async function getMysteries() {
       }
     },
     orderBy: {
-      createdAt: 'desc'
+      enlisted: 'desc'
     }
   })
 
