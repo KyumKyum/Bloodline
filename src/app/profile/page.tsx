@@ -18,7 +18,7 @@ export const metadata = {
 }
 
 async function getUserRatings(userId: string) {
-  const [ratings, difficultyRatings] = await Promise.all([
+  const [ratings, difficultyRatings, comments] = await Promise.all([
     // Get user's star ratings with mystery details
     prisma.rating.findMany({
       where: { userId },
@@ -35,6 +35,15 @@ async function getUserRatings(userId: string) {
         mystery: true
       },
       orderBy: { updatedAt: 'desc' }
+    }),
+
+    // Get user's comments with mystery details
+    (prisma as any).comment.findMany({
+      where: { userId },
+      include: {
+        mystery: true
+      },
+      orderBy: { updatedAt: 'desc' }
     })
   ])
 
@@ -42,18 +51,20 @@ async function getUserRatings(userId: string) {
   const mysteriesMap = new Map()
 
   // Add star ratings
-  ratings.forEach(rating => {
+  ratings.forEach((rating: any) => {
     mysteriesMap.set(rating.mysteryId, {
       mystery: rating.mystery,
       starRating: rating.rating,
       starRatedAt: rating.updatedAt,
       difficultyRating: null,
-      difficultyRatedAt: null
+      difficultyRatedAt: null,
+      comment: null,
+      commentedAt: null
     })
   })
 
   // Add difficulty ratings
-  difficultyRatings.forEach(rating => {
+  difficultyRatings.forEach((rating: any) => {
     if (mysteriesMap.has(rating.mysteryId)) {
       // Update existing entry
       const existing = mysteriesMap.get(rating.mysteryId)
@@ -66,7 +77,30 @@ async function getUserRatings(userId: string) {
         starRating: null,
         starRatedAt: null,
         difficultyRating: rating.difficulty,
-        difficultyRatedAt: rating.updatedAt
+        difficultyRatedAt: rating.updatedAt,
+        comment: null,
+        commentedAt: null
+      })
+    }
+  })
+
+  // Add comments
+  comments.forEach((comment: any) => {
+    if (mysteriesMap.has(comment.mysteryId)) {
+      // Update existing entry
+      const existing = mysteriesMap.get(comment.mysteryId)
+      existing.comment = comment.content
+      existing.commentedAt = comment.updatedAt
+    } else {
+      // Create new entry
+      mysteriesMap.set(comment.mysteryId, {
+        mystery: comment.mystery,
+        starRating: null,
+        starRatedAt: null,
+        difficultyRating: null,
+        difficultyRatedAt: null,
+        comment: comment.content,
+        commentedAt: comment.updatedAt
       })
     }
   })
@@ -75,11 +109,13 @@ async function getUserRatings(userId: string) {
   return Array.from(mysteriesMap.values()).sort((a, b) => {
     const aLatest = Math.max(
       a.starRatedAt?.getTime() || 0,
-      a.difficultyRatedAt?.getTime() || 0
+      a.difficultyRatedAt?.getTime() || 0,
+      a.commentedAt?.getTime() || 0
     )
     const bLatest = Math.max(
       b.starRatedAt?.getTime() || 0,
-      b.difficultyRatedAt?.getTime() || 0
+      b.difficultyRatedAt?.getTime() || 0,
+      b.commentedAt?.getTime() || 0
     )
     return bLatest - aLatest
   })
@@ -158,7 +194,7 @@ export default async function ProfilePage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 평가 통계
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-2xl font-bold text-gray-900">
                     {userRatings.length}
@@ -176,6 +212,12 @@ export default async function ProfilePage() {
                     {userRatings.filter(r => r.difficultyRating !== null).length}
                   </div>
                   <div className="text-sm text-gray-600">난이도 평가</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-2xl font-bold text-gray-900">
+                    {userRatings.filter(r => r.comment !== null).length}
+                  </div>
+                  <div className="text-sm text-gray-600">작성한 댓글</div>
                 </div>
               </div>
             </div>
@@ -232,14 +274,29 @@ export default async function ProfilePage() {
                               />
                             </div>
                           </div>
+
+                          {/* Comment */}
+                          {item.comment && (
+                            <div className="border-t pt-3">
+                              <div className="text-sm text-gray-500 mb-1">내 댓글</div>
+                              <div className="bg-gray-50 rounded-md p-3">
+                                <p className="text-sm text-gray-800 line-clamp-3">
+                                  {item.comment}
+                                </p>
+                              </div>
+                            </div>
+                          )}
                           
-                          {/* Rating dates */}
+                          {/* Activity dates */}
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-gray-400">
                             {item.starRatedAt && (
                               <span>별점: {item.starRatedAt.toLocaleDateString('ko-KR')}</span>
                             )}
                             {item.difficultyRatedAt && (
                               <span>난이도: {item.difficultyRatedAt.toLocaleDateString('ko-KR')}</span>
+                            )}
+                            {item.commentedAt && (
+                              <span>댓글: {item.commentedAt.toLocaleDateString('ko-KR')}</span>
                             )}
                           </div>
                         </div>
