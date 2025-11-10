@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star } from 'lucide-react'
+import { Star, MessageCircle } from 'lucide-react'
 import { DifficultyBadge } from './DifficultyBadge'
 
 interface MysteryCardProps {
@@ -15,6 +15,7 @@ interface MysteryCardProps {
     difficulty: number
     averageDifficulty: number | null
     totalDifficultyRatings: number
+    totalComments: number
   }
 }
 
@@ -66,21 +67,32 @@ export function MysteryCard({ mystery }: MysteryCardProps) {
             </p>
           </div>
           
-          <div className="flex items-center justify-between mt-auto">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center">
-                {renderStars(mystery.averageRating)}
+          <div className="mt-auto">
+            {/* Rating and Comment count */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  {renderStars(mystery.averageRating)}
+                </div>
+                {mystery.averageRating !== null && (
+                  <span className="text-sm text-yellow-600 font-semibold">
+                    {mystery.averageRating.toFixed(1)}
+                  </span>
+                )}
+                {mystery.totalRatings > 0 && (
+                  <span className="text-sm text-gray-500">
+                    ({mystery.totalRatings})
+                  </span>
+                )}
               </div>
-              {mystery.averageRating !== null && (
-                <span className="text-sm text-yellow-600 font-semibold">
-                  {mystery.averageRating.toFixed(1)}
+              
+              {/* Comment count */}
+              <div className="flex items-center space-x-1 text-gray-500">
+                <MessageCircle className="w-4 h-4" />
+                <span className="text-sm">
+                  {mystery.totalComments}
                 </span>
-              )}
-              {mystery.totalRatings > 0 && (
-                <span className="text-sm text-gray-500">
-                  ({mystery.totalRatings})
-                </span>
-              )}
+              </div>
             </div>
           </div>
         </div>

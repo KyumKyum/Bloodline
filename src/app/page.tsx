@@ -1,44 +1,11 @@
-import { prisma } from '@/lib/prisma'
-import { MysteryCard } from '@/components/MysteryCard'
 import { Header } from '@/components/Header'
+import { MysteryGrid } from '@/components/MysteryGrid'
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-async function getMysteries() {
-  const mysteries = await prisma.mystery.findMany({
-    include: {
-      ratings: true,
-      difficultyRatings: true,
-      _count: {
-        select: {
-          ratings: true,
-          difficultyRatings: true
-        }
-      }
-    },
-    orderBy: {
-      enlisted: 'desc'
-    }
-  })
-
-  return mysteries.map((mystery: any) => ({
-    ...mystery,
-    averageRating: mystery.ratings.length > 0 
-      ? mystery.ratings.reduce((acc: number, rating: any) => acc + rating.rating, 0) / mystery.ratings.length
-      : null,
-    totalRatings: mystery._count.ratings,
-    averageDifficulty: mystery.difficultyRatings.length > 0 
-      ? mystery.difficultyRatings.reduce((acc: number, rating: any) => acc + rating.difficulty, 0) / mystery.difficultyRatings.length
-      : null,
-    totalDifficultyRatings: mystery._count.difficultyRatings
-  }))
-}
-
-export default async function Home() {
-  const mysteries = await getMysteries()
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -53,21 +20,7 @@ export default async function Home() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mysteries.map((mystery: any) => (
-            <MysteryCard
-              key={mystery.id}
-              mystery={mystery}
-            />
-          ))}
-        </div>
-
-        {mysteries.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No mysteries found.</p>
-            <p className="text-gray-400">Check back soon for new cases!</p>
-          </div>
-        )}
+        <MysteryGrid />
       </main>
     </div>
   )
