@@ -38,8 +38,8 @@ export function MysteryCard({ mystery }: MysteryCardProps) {
 
   return (
     <Link href={`/mystery/${mystery.slug}`}>
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-        <div className="relative h-48">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-96 flex flex-col">
+        <div className="relative h-48 flex-shrink-0">
           <Image
             src={mystery.imagePath}
             alt={mystery.title}
@@ -55,16 +55,18 @@ export function MysteryCard({ mystery }: MysteryCardProps) {
           </div>
         </div>
         
-        <div className="p-4">
-          <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-            {mystery.title}
-          </h3>
+        <div className="p-4 flex flex-col justify-between flex-1">
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+              {mystery.title}
+            </h3>
+            
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+              {mystery.synopsis}
+            </p>
+          </div>
           
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-            {mystery.synopsis}
-          </p>
-          
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-auto">
             <div className="flex items-center space-x-2">
               <div className="flex items-center">
                 {renderStars(mystery.averageRating)}
