@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "DATABASE_URL=\"postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public\" prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "DATABASE_URL=\"postgresql://bloodline_user:bloodline_password@localhost:5432/bloodline?schema=public\" prisma studio",
-    "db:reset": "npm run db:migrate && npm run db:seed"
+    "db:studio": "prisma studio",
+    "db:reset": "npm run db:migrate && npm run db:seed",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
