@@ -1,0 +1,25 @@
+{
+  "name": "Bloodline - 머더 미스터리 아카이브",
+  "short_name": "Bloodline",
+  "description": "주인장이 해본 머미만 기록합니다. 흥미로운 머더 미스터리를 아카이빙하고 난이도와 평점을 공유하는 플랫폼입니다.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#ef4444",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["entertainment", "games", "lifestyle"],
+  "lang": "ko",
+  "orientation": "portrait-primary"
+}
